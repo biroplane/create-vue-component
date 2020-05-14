@@ -8,48 +8,46 @@ import {
 
 const readdir = promisify(fs.readdir);
 
-function writeCustomFile(name, content) {
-  console.log("Write custom file ", name, content);
-
-  fs.writeFile(name, content, function (err) {
-    if (err) {
-      // there was an error
-      console.log(err);
-    } else {
-      // data written successfully
-      console.log("%s File written successfully", chalk.green.bold("✔"));
-    }
-  });
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
 export async function createVueComponent(options) {
   options = {
     ...options,
     targetDirectory: options.targetDirectory || process.cwd(),
   };
-  console.log("%s Creo il Componente ", chalk.green.bold('✔'), options.template)
-  let dir
+  let name = capitalize(options.template)
+  let dir = __dirname + path.sep + name;
+  console.log("%s Creating component: \t", chalk.green.bold('✔'), name)
   try {
     if (options.folder) {
       //creo la cartella
-      dir = __dirname + path.sep + options.template;
-      console.log("Dir ", dir)
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir)
+        console.log("%s Creating Folder 📂: \t", chalk.green.bold('✔'))
+      } else {
+        console.log("%s Folder alreeady exists 📂:\t ", chalk.yellow.bold('⚠'), name)
       }
+
     }
     let vueContent = `
-            <template src="./${options.template}.html"></template>
-            <script src="./${options.template}.js"></script>
-            <script src="./${options.template}.ctrl.js"></script>
-            <style src="./${options.template}.scss"></style>
-            `
+    <template src="./${name}.html"></template>
+    <script src="./${name}.js"></script>
+    <script src="./${name}.ctrl.js"></script>
+    <style src="./${name}.scss" lang="scss"></style>
+    `
     let jsContent = `export default {}`
     let scssContent = `@import variables`
-    fs.writeFileSync(dir + path.sep + options.template + '.vue', vueContent)
-    fs.writeFileSync(dir + path.sep + options.template + '.js', jsContent)
-    fs.writeFileSync(dir + path.sep + options.template + '.ctrl.js', jsContent)
-    fs.writeFileSync(dir + path.sep + options.template + '.scss', scssContent)
-    fs.writeFileSync(dir + path.sep + options.template + '.html')
+    fs.writeFileSync(dir + path.sep + name + '.vue', vueContent)
+    console.log("%s Creating Vue File 📂: \t", chalk.green.bold('✔'))
+    fs.writeFileSync(dir + path.sep + name + '.js', jsContent)
+    console.log("%s Creating Js File 📂: \t", chalk.green.bold('✔'))
+    fs.writeFileSync(dir + path.sep + name + '.ctrl.js', jsContent)
+    console.log("%s Creating Js Store File 📂: \t", chalk.green.bold('✔'))
+    fs.writeFileSync(dir + path.sep + name + '.scss', scssContent)
+    console.log("%s Creating Scss File 📂: \t", chalk.green.bold('✔'))
+    fs.writeFileSync(dir + path.sep + name + '.html')
+    console.log("%s Creating Html File 📂: \t", chalk.green.bold('✔'))
 
   } catch (error) {
     console.log("errore", error)
